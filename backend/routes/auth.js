@@ -4,9 +4,9 @@ const bcrypt = require("bcryptjs");
 
 router.post("/registrar", async (req,res) => {
     try{
-        const {email, senha} = req.body;
+        const {name, gender, idade, email, senha} = req.body;
         const hashsenha = bcrypt.hashSync(senha);
-        const user = new User({email, senha: hashsenha});
+        const user = new User({name, gender, idade, email, senha: hashsenha});
         await user.save().then(() => res.status(200).json({user: user}));
     } catch (error) {
         res.status(400).json({message: "Usuario Ja Existe"});
