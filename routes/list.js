@@ -36,7 +36,13 @@ router.put("/atualizaTodo/:id", async (req,res) => {
 
 router.delete("/delTodo/:id", async (req,res) => {
     try{
-        await List.findByIdAndDelete(req.params.id).then(() => res.status(200).json({message : "Todo Deletada"}));
+        const {email} = req.headers;
+        const veriUser = await User.findOneAndUpdate({email}, {$pull: {list: req.params.id}});
+        if (veriUser) {
+            await List.findByIdAndDelete(req.params.id).then(() => res.status(200).json({message : "Todo Deletada"}));
+        } else {
+            res.status(400).json({message: "Erro de Autentificacao"});
+        }
     } catch (error){
         console.log(error);
         res.status(400).json({message: "Todo Nao encontrada"});
