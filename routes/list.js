@@ -14,6 +14,7 @@ router.post("/addTodo", async (req,res) => {
         }
     } catch (error){
         console.log(error);
+        res.status(400).json({message: "Erro Inesperado"});
     }
 });
 
@@ -24,9 +25,12 @@ router.put("/atualizaTodo/:id", async (req,res) => {
         if (veriUser) {
             const list = await List.findByIdAndUpdate(req.params.id, {title, body, checkbox});
             list.save().then(() => res.status(200).json({message: "Todo Atualizada"}));
+        } else {
+            res.status(400).json({message: "Todo Nao encontrada"});
         }
     } catch (error){
         console.log(error);
+        res.status(400).json({message: "Erro Inesperado"});
     }
 });
 
@@ -39,17 +43,37 @@ router.delete("/delTodo/:id", async (req,res) => {
         }
     } catch (error){
         console.log(error);
+        res.status(400).json({message: "Todo Nao encontrada"});
     }
 });
 
-router.get("/getTodo/:id", async (req,res) => {
-    const list = await List.find({user: req.params.id}).sort({createdAt: -1});
-    if(list.length !== 0){
-        res.status(200).json({list});
-    } else {
-        res.status(200).json({message: "Sem Todo"});
+router.get("/getUserTodo/:id", async (req,res) => {
+    try {
+        const list = await List.find({user: req.params.id}).sort({createdAt: -1});
+        if(list.length !== 0){
+            res.status(200).json({list});
+        } else {
+            res.status(200).json({message: "Sem Todo"});
+        }
+    } catch (error){
+        console.log(error);
+        res.status(400).json({message: "Erro Inesperado"});
     }
     
 });
+
+router.get("/getTodo/:id", async (req,res) => {
+    try{
+        const list = await List.findOne({_id: req.params.id});
+        if(list){
+            res.status(200).json({list});
+        } else {
+            res.status(400).json({message: "Todo Nao encontrada"});
+        }
+    } catch (error){
+        console.log(error);
+        res.status(400).json({message: "Todo Nao encontrada"});
+    }
+})
 
 module.exports = router;
