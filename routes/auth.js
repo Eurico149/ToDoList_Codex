@@ -35,14 +35,21 @@ router.put("/atualizaUser/:id", async (req,res) => {
         const {name, gender, idade, email, senhaAtual, novaSenha} = req.body;
         const veriUser = await User.findOne({email});
         if (veriUser) {
-            const actPass = bcrypt.compareSync(senhaAtual, veriUser.senha);
-            if (actPass) {
-                const hashsenha = bcrypt.hashSync(novaSenha)
-                const user = await User.findByIdAndUpdate(req.params.id, {name, gender, idade, senha: hashsenha});
+            if (senhaAtual == "" && novaSenha === "") {
+                const user = await User.findByIdAndUpdate(req.params.id, {name, gender, idade, senha: veriUser.senha});
                 user.save().then(() => res.status(200).json({message: "Usuário atualizado."}));
-        } else {
-            res.status(400).json({message: "Senha atual não coincide!"});
-        }
+            } else if (senhaAtual && novaSenha.length > 6) {
+                const actPass = bcrypt.compareSync(senhaAtual, veriUser.senha);
+                if (actPass) {
+                    const hashsenha = bcrypt.hashSync(novaSenha)
+                    const user = await User.findByIdAndUpdate(req.params.id, {name, gender, idade, senha: hashsenha});
+                    user.save().then(() => res.status(200).json({message: "Usuário atualizado."}));
+                } else {
+                    res.status(400).json({message: "Senha atual incorreta!"});
+                }
+            } else {
+                res.status(400).json({message: "Preencha os campos corretamente!"});
+            }
         } else {
             res.status(400).json({message: "Usuário não encontrado!"});
         }
