@@ -30,4 +30,21 @@ router.post("/login", async (req,res) => {
     }
 });
 
+router.put("/atualizaUser/:id", async (req,res) => {
+    try{
+        const {name, gender, idade, email, senha} = req.body;
+        const veriUser = await User.findOne({email});
+        if (veriUser) {
+            const hashsenha = bcrypt.hashSync(senha);
+            const user = await User.findByIdAndUpdate(req.params.id, {name, gender, idade, senha: hashsenha});
+            user.save().then(() => res.status(200).json({message: "Usuário atualizado."}));
+        } else {
+            res.status(400).json({message: "Usuário não encontrado!"});
+        }
+    } catch (error){
+        console.log(error);
+        res.status(400).json({message: "Erro Inesperado"});
+    }
+});
+
 module.exports = router;
