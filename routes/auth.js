@@ -38,7 +38,7 @@ router.put("/atualizaUser/:id", async (req,res) => {
             if (senhaAtual == "" && novaSenha === "") {
                 const user = await User.findByIdAndUpdate(req.params.id, {name, gender, idade, senha: veriUser.senha});
                 user.save().then(() => res.status(200).json({message: "Usuário atualizado."}));
-            } else if (senhaAtual && novaSenha.length > 6) {
+            } else if (senhaAtual && novaSenha.length >= 6) {
                 const actPass = bcrypt.compareSync(senhaAtual, veriUser.senha);
                 if (actPass) {
                     const hashsenha = bcrypt.hashSync(novaSenha)
